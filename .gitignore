@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Vercel or other deployment artifacts (optional, if used)
+.vercel/
+.netlify/
+
+# IDEs
+.vscode/
+.idea/
