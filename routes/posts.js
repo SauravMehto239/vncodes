@@ -24,14 +24,14 @@ router.post('/', upload.single('image_file'), async (req, res) => {
       postAmount = amount;
     }
 
-    // Prepare image fields
-    let imageUrl = '';
-    let externalImageLink = '';
+    // Prepare media fields
+    let mediaUrl = '';
+    let externalMediaLink = '';
 
     if (req.file) {
-      imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+      mediaUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     } else if (image_link) {
-      externalImageLink = image_link;
+      externalMediaLink = image_link;
     }
 
     const newPost = new Post({
@@ -40,8 +40,8 @@ router.post('/', upload.single('image_file'), async (req, res) => {
       description,
       type,
       amount: postAmount,
-      image_url: imageUrl,
-      image_link: externalImageLink,
+      image_url: mediaUrl,       // stored locally
+      image_link: externalMediaLink  // external media
     });
 
     await newPost.save();
@@ -95,23 +95,23 @@ router.put('/:id', upload.single('image_file'), async (req, res) => {
       post.amount = 0;
     }
 
-    // Update image if provided
+    // Update media
     if (req.file) {
-      // Delete old image file if stored locally
+      // Delete old media file if stored locally
       if (post.image_url && post.image_url.startsWith(`${req.protocol}://${req.get('host')}/uploads/`)) {
-        const oldImagePath = path.join(__dirname, '..', 'uploads', path.basename(post.image_url));
-        fs.unlink(oldImagePath, (err) => {
-          if (err) console.error('Error deleting old image:', err);
+        const oldPath = path.join(__dirname, '..', 'uploads', path.basename(post.image_url));
+        fs.unlink(oldPath, (err) => {
+          if (err) console.error('Error deleting old file:', err);
         });
       }
       post.image_url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-      post.image_link = ''; // Clear external link if uploading new image
+      post.image_link = ''; // Clear external link if uploading new file
     } else if (image_link) {
       // If external link is provided, clear local image_url
       if (post.image_url && post.image_url.startsWith(`${req.protocol}://${req.get('host')}/uploads/`)) {
-        const oldImagePath = path.join(__dirname, '..', 'uploads', path.basename(post.image_url));
-        fs.unlink(oldImagePath, (err) => {
-          if (err) console.error('Error deleting old image:', err);
+        const oldPath = path.join(__dirname, '..', 'uploads', path.basename(post.image_url));
+        fs.unlink(oldPath, (err) => {
+          if (err) console.error('Error deleting old file:', err);
         });
       }
       post.image_link = image_link;
@@ -131,11 +131,11 @@ router.delete('/:id', async (req, res) => {
     const post = await Post.findByIdAndDelete(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
 
-    // Delete image file if stored locally
+    // Delete media file if stored locally
     if (post.image_url && post.image_url.startsWith(`${req.protocol}://${req.get('host')}/uploads/`)) {
-      const imagePath = path.join(__dirname, '..', 'uploads', path.basename(post.image_url));
-      fs.unlink(imagePath, (err) => {
-        if (err) console.error('Error deleting image:', err);
+      const mediaPath = path.join(__dirname, '..', 'uploads', path.basename(post.image_url));
+      fs.unlink(mediaPath, (err) => {
+        if (err) console.error('Error deleting file:', err);
       });
     }
 
@@ -146,4 +146,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
-
