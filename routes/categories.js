@@ -1,19 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const Category = require('../models/Category');
+const upload = require('../middleware/upload');
+const path = require('path');
 
-// Utility to validate category input
-const validateCategory = ({ name, description, thumbnail }) => {
-  return name && description && thumbnail;
-};
-
-// Create a new category
-router.post('/', async (req, res) => {
+// Create a new category with file upload
+router.post('/', upload.single('thumbnail'), async (req, res) => {
   try {
-    const { name, description, thumbnail } = req.body;
+    const { name, description } = req.body;
+    const thumbnail = req.file ? `/uploads/${req.file.filename}` : null;
 
-    if (!validateCategory(req.body)) {
-      return res.status(400).json({ message: 'Name, description, and thumbnail are required' });
+    if (!name || !description || !thumbnail) {
+      return res.status(400).json({ message: 'Name, description, and thumbnail file are required' });
     }
 
     const newCategory = new Category({ name, description, thumbnail });
@@ -48,12 +46,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update a category
-router.put('/:id', async (req, res) => {
+// Update a category with optional file upload
+router.put('/:id', upload.single('thumbnail'), async (req, res) => {
   try {
-    const { name, description, thumbnail } = req.body;
+    const { name, description } = req.body;
+    const thumbnail = req.file ? `/uploads/${req.file.filename}` : req.body.thumbnail;
 
-    if (!validateCategory(req.body)) {
+    if (!name || !description || !thumbnail) {
       return res.status(400).json({ message: 'Name, description, and thumbnail are required' });
     }
 

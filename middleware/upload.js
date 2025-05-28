@@ -1,36 +1,41 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+// Ensure uploads folder exists
+const uploadDir = './uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Set storage engine
 const storage = multer.diskStorage({
-  destination: './uploads/',
+  destination: uploadDir,
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+    const ext = path.extname(file.originalname);
+    const filename = `${Date.now()}${ext}`;
+    cb(null, filename);
   }
 });
 
-// Check file type
+// Check file type (images and gifs)
 function checkFileType(file, cb) {
-  // Allowed extensions
-  const filetypes = /jpeg|jpg|png|gif|mp4|mov/;
+  const allowedTypes = /jpeg|jpg|png|gif|webp/; // Allowed image/gif types only
 
-  // Check extension
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // Check MIME type
-  const mimetype = filetypes.test(file.mimetype.toLowerCase());
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype.toLowerCase());
 
-  if (mimetype && extname) {
-    return cb(null, true);
+  if (extname && mimetype) {
+    cb(null, true);
   } else {
-    cb('Error: Only images and videos (jpeg, png, gif, mp4, mov) are allowed!');
+    cb(new Error('Only image files (jpeg, jpg, png, gif, webp) are allowed!'));
   }
 }
 
-// Initialize upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 100000000 }, // 100MB limit — increase if needed
-  fileFilter: function (req, file, cb) {
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max file size
+  fileFilter: (req, file, cb) => {
     checkFileType(file, cb);
   }
 });
