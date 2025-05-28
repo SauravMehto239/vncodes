@@ -18,23 +18,24 @@ const storage = multer.diskStorage({
   }
 });
 
-// Check file type (images and gifs)
+// Check file type (images and videos)
 function checkFileType(file, cb) {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/; // Allowed image/gif types only
+  // Allowed types: images (jpeg, jpg, png, gif, webp) and videos (mp4, mov, avi, mkv, webm, etc.)
+  const allowedTypes = /jpeg|jpg|png|gif|webp|mp4|mov|avi|mkv|webm/;
 
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype.toLowerCase());
+  const extnameMatch = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetypeMatch = allowedTypes.test(file.mimetype.toLowerCase());
 
-  if (extname && mimetype) {
+  if (extnameMatch && mimetypeMatch) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files (jpeg, jpg, png, gif, webp) are allowed!'));
+    cb(new Error('Only image files (jpeg, jpg, png, gif, webp) and videos (mp4, mov, avi, mkv, webm) are allowed!'));
   }
 }
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max file size
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB max file size
   fileFilter: (req, file, cb) => {
     checkFileType(file, cb);
   }
