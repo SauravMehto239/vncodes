@@ -10,4 +10,12 @@ const postSchema = new mongoose.Schema({
   image_link: { type: String },  // For external image URL/link
 }, { timestamps: true });
 
+
 module.exports = mongoose.model('Post', postSchema);
+
+
+
+
+
+
+
