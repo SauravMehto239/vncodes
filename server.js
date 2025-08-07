@@ -7,9 +7,9 @@ const path = require('path'); // declare once at the top
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
-const categoryRoutes = require('./routes/categories');
-const postRoutes = require('./routes/posts');
-const paymentRoutes = require('./routes/payments'); // payment routes
+const paymentRoutes = require('./routes/payments');
+const productRoutes = require('./routes/product'); // new product route
+const loginUsersRoutes = require('./routes/login-users'); // login users route
 
 const app = express();
 
@@ -22,9 +22,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/posts', postRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/products', productRoutes); // new product route
+app.use('/api/auth', loginUsersRoutes); // login users route
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
