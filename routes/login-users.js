@@ -1,26 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+
 router.get('/login-users', async (req, res) => {
   try {
-    // Extract userIds from activeTokens by verifying tokens
-    const users = [];
-
-    for (const token of activeTokens) {
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById(decoded.userId, '-password');
-        if (user) {
-          users.push(user);
-        }
-      } catch (err) {
-        // Token expired or invalid, remove from activeTokens
-        activeTokens.delete(token);
-      }
-    }
-
+    // Get all users (excluding password) sorted by last login time
+    const users = await User.find({}, '-password').sort({ lastLogin: -1 });
     res.json(users);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching logged-in users' });
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Error fetching users' });
   }
 });
+
+module.exports = router;
