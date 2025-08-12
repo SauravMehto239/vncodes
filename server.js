@@ -9,7 +9,6 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const paymentRoutes = require('./routes/payments');
 const productRoutes = require('./routes/product'); // new product route
-const loginUsersRoutes = require('./routes/login-users'); // login users route
 
 const app = express();
 
@@ -24,7 +23,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/products', productRoutes); // new product route
-app.use('/api/auth', loginUsersRoutes); // login users route
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
